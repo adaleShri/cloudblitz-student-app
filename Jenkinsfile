@@ -11,9 +11,13 @@ pipeline {
         FRONTEND_CONTAINER = "student-frontend"
 
         // DB config for backend container – CHANGE THESE
-        DB_URL      = "jdbc:mariadb://<db-host>:3306/student_db"
-        DB_USER     = "<db-user>"
-        DB_PASSWORD = "<db-pass>"
+        DB_URL      = "jdbc:mariadb://database-1.cfaiygu847jg.ap-south-1.rds.amazonaws.com:3306/student_db"
+        DB_USER     = "admin"
+        DB_PASSWORD = "admin123"
+
+        // Host ports
+        BACKEND_HOST_PORT = "8081"   // host:8081 -> container:8080
+        FRONTEND_HOST_PORT = "80"    // host:80   -> container:80
     }
 
     stages {
@@ -49,21 +53,17 @@ pipeline {
             steps {
                 sh '''
                 echo "Stopping old backend container if exists..."
-                if [ $(docker ps -q -f name=${BACKEND_CONTAINER}) ]; then
-                    docker stop ${BACKEND_CONTAINER}
-                fi
+                docker stop ${BACKEND_CONTAINER} || true
 
                 echo "Removing old backend container if exists..."
-                if [ $(docker ps -aq -f name=${BACKEND_CONTAINER}) ]; then
-                    docker rm ${BACKEND_CONTAINER}
-                fi
+                docker rm ${BACKEND_CONTAINER} || true
 
-                echo "Starting new backend container..."
+                echo "Starting new backend container on host port ${BACKEND_HOST_PORT}..."
                 docker run -d --name ${BACKEND_CONTAINER} \
                   -e SPRING_DATASOURCE_URL=${DB_URL} \
                   -e SPRING_DATASOURCE_USERNAME=${DB_USER} \
                   -e SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD} \
-                  -p 8080:8080 \
+                  -p ${BACKEND_HOST_PORT}:8080 \
                   ${BACKEND_IMAGE}:latest
                 '''
             }
@@ -73,18 +73,14 @@ pipeline {
             steps {
                 sh '''
                 echo "Stopping old frontend container if exists..."
-                if [ $(docker ps -q -f name=${FRONTEND_CONTAINER}) ]; then
-                    docker stop ${FRONTEND_CONTAINER}
-                fi
+                docker stop ${FRONTEND_CONTAINER} || true
 
                 echo "Removing old frontend container if exists..."
-                if [ $(docker ps -aq -f name=${FRONTEND_CONTAINER}) ]; then
-                    docker rm ${FRONTEND_CONTAINER}
-                fi
+                docker rm ${FRONTEND_CONTAINER} || true
 
-                echo "Starting new frontend container..."
+                echo "Starting new frontend container on host port ${FRONTEND_HOST_PORT}..."
                 docker run -d --name ${FRONTEND_CONTAINER} \
-                  -p 80:80 \
+                  -p ${FRONTEND_HOST_PORT}:80 \
                   ${FRONTEND_IMAGE}:latest
                 '''
             }
