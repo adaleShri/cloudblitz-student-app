@@ -13,7 +13,7 @@ pipeline {
         // DB config for backend container – CHANGE THESE
        DB_URL      = "jdbc:mariadb://student-mariadb:3306/student_db"
        DB_USER     = "root"
-       DB_PASSWORD = "admin123"
+       DB_PASSWORD = "studentpass"
 
 
         // Host ports
