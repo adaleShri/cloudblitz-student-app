@@ -11,9 +11,9 @@ pipeline {
         FRONTEND_CONTAINER = "student-frontend"
 
         // DB config for backend container – CHANGE THESE
-       DB_URL      = "jdbc:mariadb://student-mariadb:3306/student_db"
-       DB_USER     = "root"
-       DB_PASSWORD = "studentpass"
+       DB_URL      = "jdbc:mariadb://database-1.cfaiygu847jg.ap-south-1.rds.amazonaws.com:3306/student_db"
+       DB_USER     = "admin"
+       DB_PASSWORD = "admin123"
 
 
         // Host ports
